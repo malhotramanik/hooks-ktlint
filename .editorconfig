@@ -1,0 +1,9 @@
+[*]
+indent_size = 2
+indent_style = space
+max_line_length = 120
+
+[*.{kt,kts}]
+ktlint_disabled_rules = no-wildcard-imports
+ij_kotlin_allow_trailing_comma = true # will add Trailing comma on declaration site
+ij_kotlin_allow_trailing_comma_on_call_site = true # will add Trailing comma on call site
