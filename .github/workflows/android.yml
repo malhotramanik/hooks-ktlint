@@ -26,4 +26,9 @@ jobs:
       run: ./gradlew build
     - name: assembleDebug
       run: ./gradlew assembleDebug
-    - run: ls ${{ ./app/build/output/debug/ }}
+    - run: |
+          files=$(ls $BUILD_PATH)
+          IFS=$'\n' files_array=($files)
+          first_file=${files_array[0]}
+          echo $first_file
+          echo "::set-output name=file_name::${first_file}"
