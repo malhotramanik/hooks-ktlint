@@ -26,4 +26,4 @@ jobs:
       run: ./gradlew build
     - name: assembleDebug
       run: ./gradlew assembleDebug
-      run: ls ${{ ./app/build/output/debug/ }}
+    - run: ls ${{ ./app/build/output/debug/ }}
