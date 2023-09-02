@@ -24,5 +24,6 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-    - name: Build with Gradle
+    - name: assembleDebug
       run: ./gradlew assembleDebug
+      run: ls ${{ ./app/build/output/debug/ }}
