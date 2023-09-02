@@ -3,8 +3,8 @@ name: Android CI
 on:
   push:
     branches: [ "new-action-1" ]
-  pull_request:
-    branches: [ "main" ]
+  # pull_request:
+    # branches: [ "main" ]
 
 jobs:
   build:
@@ -22,11 +22,12 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+    # - name: Build with Gradle
+      # run: ./gradlew build
     - name: assembleDebug
       run: ./gradlew assembleDebug
     - run: |
+          echo "BUILD_PATH=app/build/outputs/apk/debug/" >> $GITHUB_ENV
           files=$(ls $BUILD_PATH)
           IFS=$'\n' files_array=($files)
           first_file=${files_array[0]}
