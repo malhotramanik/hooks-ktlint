@@ -1,7 +1,6 @@
 name: Demo Action 
 run-name: ${{github.actor}} Run Demo Action
 on: 
-- push
 - pull_request
 
 jobs:
