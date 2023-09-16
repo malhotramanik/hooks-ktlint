@@ -12,8 +12,8 @@ jobs:
       - name: Print Branch Name
         run: echo "Branch Name = ${{ steps.branch-name.outputs.current_branch }}"
       
-      - name: Running on the default branch
-        if: steps.branch-name.outputs.is_default == 'true'
-        run: |
-          echo "Running on default: ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" 
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
         
