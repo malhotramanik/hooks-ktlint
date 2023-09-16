@@ -17,5 +17,16 @@ jobs:
       - name: Print Branch Name
         run: echo "Branch Name = ${{ steps.extract_branch.outputs.branch }}"
 
+      - name: Check Base & Current Branch Pattern
+        run: |
+          if [[ "${{ github.base_ref }}" =~ release/[0-9]+.[0-9]+/[0-9]+.[0-9]+.[0-9]+ ]]; then
+            if [[ "${{ github.head_ref }}" =~ feature/[A-Za-z]+-[0-9]+/master || "${{ github.head_ref }}" =~ bugfix/[A-Za-z]+-[0-9]+/master ]]; then
+              echo "No issue"
+            else
+              echo "Branch name should be like: feature/MOB-111/master/short_desc or bugfix/MOB-111/master/short_desc"
+              exit 1
+            fi
+          fi
+
         
         
