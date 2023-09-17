@@ -3,11 +3,9 @@ run-name: Check Branch Pattern [${{ github.actor }}]
 
 on:
   pull_request:
-    types: [ synchronize, labeled, edited ]
+    types: [ synchronize, edited ]
     branches:
       - '**'
-    tags:
-      - 'v*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,11 +15,6 @@ jobs:
   branch-pattern:
     name: Check Branch Pattern
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-      actions: write
-      pull-requests: write
 
     steps:
       - name: Base branch as release branch
@@ -45,22 +38,3 @@ jobs:
               exit 1
             fi
           fi
-          
-      
-      - name: Checkout code
-        uses: actions/checkout@main
-        
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false
