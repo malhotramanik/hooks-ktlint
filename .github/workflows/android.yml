@@ -1,5 +1,5 @@
 name: Check Branch Pattern
-run-name: Check Branch Pattern ${{ github.head_ref }} -> ${{ github.base_ref }} [${{ github.actor }}]
+run-name: Check Branch Pattern | ${{ github.head_ref }} -> ${{ github.base_ref }} | ${{ github.actor }}
 
 on:
   pull_request:
