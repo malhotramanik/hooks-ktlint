@@ -3,7 +3,7 @@ run-name: Check Branch Pattern [${{ github.actor }}]
 
 on:
   pull_request:
-    types: [ synchronize, edited ]
+    types: [ opened, synchronize, reopened, edited ]
     branches:
       - '**'
 
