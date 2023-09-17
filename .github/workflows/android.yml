@@ -1,35 +1,42 @@
-name: Android CI
+name: Check Branch Pattern
+run-name: Check Branch Pattern [${{ github.actor }}]
 
 on:
-  push:
-    branches: [ "new-action-1" ]
-  # pull_request:
-    # branches: [ "main" ]
+  pull_request:
+    types: [ opened, synchronize, reopened, edited ]
+    branches:
+      - 'release/[0-9]+.[0-9]+/[0-9]+.[0-9]+.[0-9]+'
+      - 'master'
+      - 'main'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-
+  branch-pattern:
+    name: Check Branch Pattern
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Base branch as release branch
+        run: |
+          if [[ "${{ github.base_ref }}" =~ release/[0-9]+.[0-9]+/[0-9]+.[0-9]+.[0-9]+ ]]; then
+            if [[ "${{ github.head_ref }}" =~ feature/[A-Za-z]+-[0-9]+/master || "${{ github.head_ref }}" =~ bugfix/[A-Za-z]+-[0-9]+/master ]]; then
+              echo "No issue"
+            else
+              echo "Branch name should be like: feature/MOB-111/master/short_desc or bugfix/MOB-111/master/short_desc"
+              exit 1
+            fi
+          fi
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    # - name: Build with Gradle
-      # run: ./gradlew build
-    - name: assembleDebug
-      run: ./gradlew assembleDebug
-    - run: |
-          echo "BUILD_PATH=app/build/outputs/apk/debug/" >> $GITHUB_ENV
-          files=$(ls $BUILD_PATH)
-          IFS=$'\n' files_array=($files)
-          first_file=${files_array[0]}
-          echo $first_file
-          echo "::set-output name=file_name::${first_file}"
+      - name: Base branch as master branch
+        run: |
+          if [[ "${{ github.base_ref }}" =~ master || "${{ github.base_ref }}" =~ main ]]; then
+            if [[ "${{ github.head_ref }}" =~ release/[0-9]+.[0-9]+/[0-9]+.[0-9]+.[0-9]+ ]]; then
+              echo "No issue"
+            else
+              echo "Release branch name should be like: release/1.1/1.1.0"
+              exit 1
+            fi
+          fi
