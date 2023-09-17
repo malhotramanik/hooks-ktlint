@@ -1,23 +1,69 @@
-name: Demo Action 
-run-name: ${{github.actor}} Run Demo Action
-on: 
-- pull_request
+name: Linter Run Action
+
+on:
+  pull_request:
+    types: [ synchronize, labeled ]
+    branches:
+      - '**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  Check-Demo-Action:
+  detekt:
+    name: Linter Run
+
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      actions: write
+      pull-requests: write
+
     steps:
-      - name: Print
-        run: echo "State = ${{ github.event.review.state }}"
-        
-      - name: Check if Approved
+      - name: Check Base & Current Branch Pattern
         run: |
-          if ${{ (github.event.review.state == 'approved') }}; then
-            echo "No issue"
-          else
-            echo "Pr SHould Be approved"
+          if [[ "${{ github.base_ref }}" =~ release/[0-9]+.[0-9]+/[0-9]+.[0-9]+.[0-9]+ ]]; then
+            if [[ "${{ github.head_ref }}" =~ feature/[A-Za-z]+-[0-9]+/master || "${{ github.head_ref }}" =~ bugfix/[A-Za-z]+-[0-9]+/master ]]; then
+              echo "No issue"
+            else
+              echo "Branch name should be like: feature/MOB-111/master/short_desc or bugfix/MOB-111/master/short_desc"
+              exit 1
+            fi
+          fi
 
-      - run: echo "Event Name = ${{ github.event_name }}."
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
-      - name: Print Branch Name
-        run: echo "Branch Name = ${{ github.head_ref }}"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::978222968597:role/gh-actions-oidc-customerapp-shared-Role-1X8KWAB7GNMA9
+          aws-region: ap-southeast-1
+
+      - name: Copy config from S3
+        run: |
+          aws s3 cp s3://porter-configs/linter/ linter/ --recursive
+
+      - name: Linter Run
+        uses: alaegin/Detekt-Action@v1.22.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          detekt_config: linter/detekt_config.yml
+          reviewdog_reporter: github-pr-review
+          reviewdog_level: error
+          fail_on_error: true
+
+      - name: Validate Comments
+        run: |
+          comments_json=$(curl -s -H "Authorization: Bearer ${{ secrets.github_token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments?per_page=100")
+          has_errors=$(echo "$comments_json" | jq 'map(select(.line != null)) | length > 0')
+          if [[ "$has_errors" == "true" ]]; then
+            echo "PR has unresolved comments"
+            exit 1
+          fi
