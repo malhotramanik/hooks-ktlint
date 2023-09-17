@@ -6,6 +6,8 @@ on:
     types: [ synchronize, labeled, edited ]
     branches:
       - '**'
+    tags:
+      - 'v*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
