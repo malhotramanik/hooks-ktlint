@@ -6,7 +6,10 @@ on:
 jobs:
   Check-Demo-Action:
     runs-on: ubuntu-latest
-    steps:          
+    steps:
+      - name: Print
+        run: echo "State = ${{ github.event.review.state }}"
+        
       - name: Check if Approved
         run: |
           if [[${{ github.event.review.state }} == 'approved']]; then
