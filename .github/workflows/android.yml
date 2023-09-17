@@ -19,6 +19,3 @@ jobs:
 
       - name: Print Branch Name
         run: echo "Branch Name = ${{ github.head_ref }}"
-
-        
-        github.event.review.state == 'approved'
