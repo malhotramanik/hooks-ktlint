@@ -1,5 +1,5 @@
 name: Check Branch Pattern
-run-name: Check Branch Pattern [${{ github.actor }}]
+run-name: Check Branch Pattern ${{ github.head_ref }} -> ${{ github.base_ref }} [${{ github.actor }}]
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ jobs:
             if [[ "${{ github.head_ref }}" =~ feature/[A-Za-z]+-[0-9]+/master || "${{ github.head_ref }}" =~ bugfix/[A-Za-z]+-[0-9]+/master ]]; then
               echo "No issue"
             else
-              echo "Branch name should be like: feature/MOB-111/master/short_desc or bugfix/MOB-111/master/short_desc"
+              echo "Branch name should be like: feature/MOB-111/master or bugfix/MOB-111/master"
               exit 1
             fi
           fi
