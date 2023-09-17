@@ -12,7 +12,7 @@ jobs:
         
       - name: Check if Approved
         run: |
-          if [[${{ github.event.review.state }} == 'approved']]; then
+          if ${{ (github.event.review.state == 'approved') }}; then
             echo "No issue"
           else
             echo "Pr SHould Be approved"
