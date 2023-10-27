@@ -1,0 +1,2 @@
+echo "Verifying With ktlint"
+./gradlew ktlintCheck
