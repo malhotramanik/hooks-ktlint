@@ -1,0 +1,37 @@
+name: Check First Commit Age
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  calculate-age:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Get first commit date
+      id: first_commit_date
+      env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        first_commit=$(git rev-list --reverse HEAD | head -n 1)
+        first_commit_date=$(git show -s --format=%ci $first_commit)
+        echo "First commit date: $first_commit_date"
+        echo "::set-output name=date::$first_commit_date"
+
+    - name: Calculate age
+      id: calculate_age
+      run: |
+        first_commit_date="${{ steps.first_commit_date.outputs.date }}"
+        current_date=$(date -u +"%Y-%m-%d %H:%M:%S")
+        first_commit_seconds=$(date -d "$first_commit_date" +%s)
+        current_seconds=$(date -d "$current_date" +%s)
+        age=$(( (current_seconds - first_commit_seconds) / 86400 ))
+        echo "First commit age: $age days"
+        echo "::set-output name=age::$age"
+
+    - name: Print age
+      run: echo "The first commit in this PR is ${{ steps.calculate_age.outputs.age }} days old"
