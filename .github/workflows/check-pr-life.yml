@@ -11,15 +11,18 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for all branches and tags
 
-    - name: Get first commit date
+    - name: Get first commit in PR
       id: first_commit_date
-      env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        first_commit=$(git rev-list --reverse HEAD | head -n 1)
+        # Get the base commit of the PR
+        base_commit=$(jq -r '.pull_request.base.sha' < $GITHUB_EVENT_PATH)
+        # Get the first commit in the PR by comparing with the base commit
+        first_commit=$(git rev-list $base_commit..HEAD | tail -n 1)
         first_commit_date=$(git show -s --format=%ci $first_commit)
-        echo "First commit date: $first_commit_date"
+        echo "First commit in PR: $first_commit_date"
         echo "::set-output name=date::$first_commit_date"
 
     - name: Calculate age
