@@ -1,0 +1,48 @@
+name: Close Stale PRs
+
+on:
+  schedule:
+    # Runs at 6:00 AM UTC every day
+    - cron: '0 6 * * *'
+  
+  # Optional: Allow manual triggering for testing
+  workflow_dispatch:
+
+jobs:
+  close-stale-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close stale PRs
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Only target pull requests, not issues
+          days-before-stale: 1
+          days-before-close: 0
+          stale-pr-message: "This PR has been open for 14 days with no activity. It is being closed automatically. Please reopen if still relevant."
+          close-pr-message: "This PR was closed due to inactivity for 14 days."
+          
+          # Only process PRs, ignore issues
+          only-labels: ''
+          stale-issue-label: ''
+          exempt-issue-labels: ''
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          
+          # Configure PR behavior
+          stale-pr-label: 'stale'
+          exempt-pr-labels: 'no-auto-close,keep-open'
+          exempt-draft-pr: true
+          exempt-pr-assignees: ''
+          exempt-pr-milestones: ''
+          
+          # Operation limits
+          operations-per-run: 100
+          
+          # Don't remove stale label when PR is updated
+          remove-stale-when-updated: false
+          
+          # Debug options
+          debug-only: false
+          ascending: true
