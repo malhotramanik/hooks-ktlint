@@ -3,7 +3,7 @@ name: Close Stale PRs
 on:
   schedule:
     # Runs at 6:00 AM UTC every day
-    - cron: '0 6 * * *'
+    - cron: '0 12 * * *'
   
   # Optional: Allow manual triggering for testing
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           
           # Only target pull requests, not issues
-          days-before-stale: 1
+          days-before-stale: 0
           days-before-close: 0
           stale-pr-message: "This PR has been open for 14 days with no activity. It is being closed automatically. Please reopen if still relevant."
           close-pr-message: "This PR was closed due to inactivity for 14 days."
